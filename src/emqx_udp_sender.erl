@@ -155,16 +155,15 @@ on_session_unsubscribed(#{clientid := ClientId}, Topic, Opts, {Filter}) ->
 %%--------------------------------------------------------------------
 on_message_publish(Message = #message{topic = <<"$SYS/", _/binary>>}, _Env) ->
     {ok, Message};
-on_message_publish(Message = #message{topic = Topic, flags = #{retain := Retain}}, {Filter}) ->
+on_message_publish(Message = #message{topic = Topic, payload = Payload, flags = #{retain := Retain}}, {Filter}) ->
     with_filter(
       fun() ->
         emqx_metrics:inc('emqx_udp_sender.message_publish'),
         %% Code Start
         io:format("gaogang"),
         io:format(Topic),
-        io:format(Message),
+        io:format(Payload),
         %% Here is the code
-
         %% End
         {ok, Message}
       end, Message, Topic, Filter).
