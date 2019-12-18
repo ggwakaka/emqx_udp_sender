@@ -183,8 +183,9 @@ on_message_publish(Message = #message{topic = Topic, payload = Payload, flags = 
         end,Json),
         Send = list_to_binary([<<"measurement,">> | [Tags | [<<" ">> | Fields]]]),
         io:format(Send),
-        {ok,Socket} = gen_upd:open(0,[binary]),
-        ok=gen_udp:send(Socket,"localhost",8089,Send),
+        {ok,Socket} = gen_upd:open(9999,[binary]),
+        ok=gen_udp:send(Socket,"192.168.123.121",8089,Send),
+        gen_udp:close(Socket),
         io:format("gaogang end"),
         {ok, Message}
       end, Message, Topic, Filter).
