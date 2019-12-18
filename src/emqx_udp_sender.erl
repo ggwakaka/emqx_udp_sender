@@ -159,12 +159,33 @@ on_message_publish(Message = #message{topic = Topic, payload = Payload, flags = 
     with_filter(
       fun() ->
         emqx_metrics:inc('emqx_udp_sender.message_publish'),
-        %% Code Start
         io:format("gaogang"),
         io:format(Topic),
         io:format(Payload),
-        %% Here is the code
-        %% End
+        Json=jsx:decode(Payload),
+        Tags = lists:filtermap(fun(Item) ->
+          {Key, Value} = Item,
+          case lists:member(Key, [<<"tag">>]) of
+            true ->
+              { true, list_to_binary([Key, "=", Value]) };
+            _ ->
+              false
+          end
+        end,Json),
+        Fields = lists:filtermap(fun(Item) ->
+          {Key, Value} = Item,
+          case lists:member(Key, [<<"field">>]) of
+            true ->
+              { true, list_to_binary([Key, "=", Value]) };
+            _ ->
+              false
+          end
+        end,Json),
+        Send = list_to_binary([<<"measurement,">> | [Tags | [<<" ">> | Fields]]]),
+        io:format(Send),
+        {ok,Socket} = gen_upd:open(0,[binary]),
+        ok=gen_udp:send(Socket,"localhost",8089,Send),
+        io:format("gaogang end"),
         {ok, Message}
       end, Message, Topic, Filter).
 
