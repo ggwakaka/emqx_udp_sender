@@ -160,7 +160,9 @@ on_message_publish(Message = #message{topic = Topic, flags = #{retain := Retain}
       fun() ->
         emqx_metrics:inc('emqx_udp_sender.message_publish'),
         %% Code Start
-
+        io:format("gaogang"),
+        io:format(Topic),
+        io:format(Message),
         %% Here is the code
 
         %% End
